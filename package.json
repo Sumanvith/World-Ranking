@@ -1,0 +1,35 @@
+{
+  "name": "world-ranking",
+  "version": "1.0.0",
+  "description": "world-ranking",
+  "main": "App.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test": "jest",
+    "watch-test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sumanvith/World-Ranking.git"
+  },
+  "keywords": [
+    "react",
+    "redux",
+    "tailwind"
+  ],
+  "author": "Sumanvith",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sumanvith/World-Ranking/issues"
+  },
+  "homepage": "https://github.com/Sumanvith/World-Ranking#readme",
+  "devDependencies": {
+    "parcel": "^2.12.0",
+    "process": "^0.11.10"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
