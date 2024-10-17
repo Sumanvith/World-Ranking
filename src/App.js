@@ -4,12 +4,7 @@ import Header from "./components/Header";
 import Body from "./components/Body";
 import CountryPage from "./components/CountryPage";
 
-import {
-  createBrowserRouter,
-  Outlet,
-  Router,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const AppLayout = () => {
   return (
