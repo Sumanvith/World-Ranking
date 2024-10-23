@@ -25,7 +25,7 @@ const appRouter = createBrowserRouter([
         element: <Body></Body>,
       },
       {
-        path: "/country/:country",
+        path: "/country/:countryCode",
         element: <CountryPage></CountryPage>,
       },
     ],

@@ -1,5 +1,6 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import CountryPage from "./CountryPage";
 const Body = () => {
   const regions = [
     "Americas",
@@ -11,6 +12,13 @@ const Body = () => {
   ];
 
   const [selectedRegions, setSelectedRegions] = useState([]);
+  const [listOfCountries, setListOfCountries] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [statusFilters, setStatusFilters] = useState({
+    UN: false,
+    Independent: false,
+  });
 
   const handleRegionClick = (region) => {
     if (selectedRegions.includes(region)) {
@@ -21,16 +29,64 @@ const Body = () => {
       setSelectedRegions((selectedRegions) => [...selectedRegions, region]);
     }
   };
-  console.log(selectedRegions);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const data = await fetch("https://restcountries.com/v3.1/all");
+    const json = await data.json();
+    setListOfCountries(json);
+  };
+
+  const handleSelectChange = (e) => {
+    setSelectedOption(e.target.value);
+  };
+
+  const handleSearchText = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const filterCountries = (countries) => {
+    return countries.filter((country) => {
+      const regionMatch =
+        selectedRegions.length === 0 ||
+        selectedRegions.includes(country.region);
+      const statusMatch =
+        (!statusFilters.UN || country.unMember) &&
+        (!statusFilters.Independent || country.independent);
+      const searchMatch =
+        searchText.length === 0 ||
+        country.name.common.toLowerCase().includes(searchText.toLowerCase()) ||
+        country.region.toLowerCase().includes(searchText.toLowerCase()) ||
+        (country.subregion &&
+          country.subregion.toLowerCase().includes(searchText.toLowerCase()));
+
+      return regionMatch && statusMatch && searchMatch;
+    });
+  };
+
+  const sortedAndFilteredCountries = filterCountries(listOfCountries).sort(
+    (a, b) => {
+      if (selectedOption === "population") {
+        return b.population - a.population;
+      } else if (selectedOption === "area") {
+        return b.area - a.area;
+      }
+      return 0;
+    }
+  );
+
   return (
     <div className="relative -mt-32 z-10 flex justify-center items-center ">
       <div className="w-11/12 max-h-screen overflow-hidden pb-3 rounded-lg border border-[#6C727F] bg-[#1B1D1F]">
         <div className="px-10 py-5 flex flex-row justify-between items-center w-full">
           <h1 className="p-2 text-[#6C727F] font-bold text-lg">
-            Found 234 Countries
+            Found {sortedAndFilteredCountries.length} Countries
           </h1>
           <input
-            className="p-2 rounded-lg bg-[#282B30] placeholder:text-[#6C727F] w-3/12"
+            onChange={handleSearchText}
+            className="p-2 rounded-lg bg-[#282B30] text-[#D2D5DA] placeholder:text-[#6C727F] w-3/12"
             type="text"
             placeholder="Search by Name, Region, Subregion"></input>
         </div>
@@ -48,43 +104,25 @@ const Body = () => {
               <div></div>
               <div></div>
             </div>
-
-            <div className="grid grid-cols-5 gap-y-2 text-white p-4 rounded-b-lg">
-              <div>
-                <img
-                  src="china-flag-url.png"
-                  alt="China Flag"
-                  className="w-8 h-6"
-                />
-              </div>
-              <div>China</div>
-              <div>1,402,112,000</div>
-              <div>9,706,961</div>
-              <div>Asia</div>
-
-              <div>
-                <img
-                  src="india-flag-url.png"
-                  alt="India Flag"
-                  className="w-8 h-6"
-                />
-              </div>
-              <div>India</div>
-              <div>1,439,323,776</div>
-              <div>3,287,590</div>
-              <div>Asia</div>
-
-              <div>
-                <img
-                  src="usa-flag-url.png"
-                  alt="USA Flag"
-                  className="w-8 h-6"
-                />
-              </div>
-              <div>United States</div>
-              <div>329,484,123</div>
-              <div>9,372,610</div>
-              <div>Americas</div>
+            <div className="max-h-screen mt-5 overflow-y-auto scrollbar-hide">
+              {sortedAndFilteredCountries.map((ctryData, index) => (
+                <Link
+                  to={`/country/${ctryData.cca3}`}
+                  key={index}
+                  className="grid grid-cols-5 text-white m-2 p-2 rounded-b-lg">
+                  <div>
+                    <img
+                      className="w-13 h-12 rounded-lg"
+                      src={ctryData.flags.png}
+                      alt={ctryData.flags.alt}
+                    />
+                  </div>
+                  <div>{ctryData.name.common}</div>
+                  <div>{ctryData.population.toLocaleString()}</div>
+                  <div>{ctryData.area.toLocaleString()}</div>
+                  <div>{ctryData.region}</div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -94,10 +132,12 @@ const Body = () => {
               Sort by
             </label>
             <select
+              onChange={handleSelectChange}
               id="sort"
               className="px-4 py-2 w-60 mb-3 rounded-lg border border-[#6C727F] bg-[#1B1D1F] text-[#D2D5DA]">
-              <option>Population</option>
-              <option>Area</option>
+              <option value="">Select an option</option>
+              <option value="population">Population</option>
+              <option value="area">Area</option>
             </select>
           </div>
         </div>
@@ -134,7 +174,11 @@ const Body = () => {
                   type="checkbox"
                   id="UN"
                   name="UN"
-                  value="Member of the United Nations"></input>
+                  value="Member of the United Nations"
+                  checked={statusFilters.UN}
+                  onChange={() =>
+                    setStatusFilters((prev) => ({ ...prev, UN: !prev.UN }))
+                  }></input>
                 <label className="text-[#D2D5DA] px-4 py-2" htmlFor="UN">
                   Member of the United Nations
                 </label>
@@ -145,7 +189,14 @@ const Body = () => {
                   type="checkbox"
                   id="IND"
                   name="IND"
-                  value="Independent"></input>
+                  value="Independent"
+                  checked={statusFilters.Independent}
+                  onChange={() =>
+                    setStatusFilters((prev) => ({
+                      ...prev,
+                      Independent: !prev.Independent,
+                    }))
+                  }></input>
                 <label className="text-[#D2D5DA] px-4 py-2" htmlFor="IND">
                   Independent
                 </label>
