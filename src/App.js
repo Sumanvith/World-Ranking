@@ -8,7 +8,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const AppLayout = () => {
   return (
-    <div className="bg-[#282B30] h-screen w-screen">
+    <div className="bg-[#1B1D1F]">
       <Header></Header>
       <Outlet></Outlet>
     </div>

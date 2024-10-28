@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import CountryPage from "./CountryPage";
 const Body = () => {
   const regions = [
     "Americas",
@@ -13,7 +12,7 @@ const Body = () => {
 
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [listOfCountries, setListOfCountries] = useState([]);
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState("population");
   const [searchText, setSearchText] = useState("");
   const [statusFilters, setStatusFilters] = useState({
     UN: false,
@@ -72,14 +71,16 @@ const Body = () => {
         return b.population - a.population;
       } else if (selectedOption === "area") {
         return b.area - a.area;
+      } else if (selectedOption === "name") {
+        return a.name.common.localeCompare(b.name.common);
       }
       return 0;
     }
   );
 
   return (
-    <div className="relative -mt-32 z-10 flex justify-center items-center ">
-      <div className="w-11/12 max-h-screen overflow-hidden pb-3 rounded-lg border border-[#6C727F] bg-[#1B1D1F]">
+    <div className="relative -mt-16 z-10 flex justify-center items-center ">
+      <div className="w-11/12 max-h-screen overflow-hidden pb-3 rounded-lg border border-[#3d4045] bg-[#1B1D1F]">
         <div className="px-10 py-5 flex flex-row justify-between items-center w-full">
           <h1 className="p-2 text-[#6C727F] font-bold text-lg">
             Found {sortedAndFilteredCountries.length} Countries
@@ -109,11 +110,12 @@ const Body = () => {
                 <Link
                   to={`/country/${ctryData.cca3}`}
                   key={index}
-                  className="grid grid-cols-5 text-white m-2 p-2 rounded-b-lg">
+                  className="grid grid-cols-5 text-white m-2 p-2 rounded-b-lg"
+                  state={{ country: ctryData }}>
                   <div>
                     <img
                       className="w-13 h-12 rounded-lg"
-                      src={ctryData.flags.png}
+                      src={ctryData.flags.svg}
                       alt={ctryData.flags.alt}
                     />
                   </div>
@@ -134,10 +136,10 @@ const Body = () => {
             <select
               onChange={handleSelectChange}
               id="sort"
-              className="px-4 py-2 w-60 mb-3 rounded-lg border border-[#6C727F] bg-[#1B1D1F] text-[#D2D5DA]">
-              <option value="">Select an option</option>
+              className="px-4 py-2 w-60 mb-3 rounded-lg border border-[#3d4045] bg-[#1B1D1F] text-[#D2D5DA]">
               <option value="population">Population</option>
               <option value="area">Area</option>
+              <option value="name">Name</option>
             </select>
           </div>
         </div>
@@ -170,7 +172,7 @@ const Body = () => {
             <div className="flex flex-col flex-wrap">
               <div className="flex items-center">
                 <input
-                  className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 "
+                  className="w-5 h-5 text-blue-600 bg-gray-100 border-[#3d4045] focus:ring-blue-500 "
                   type="checkbox"
                   id="UN"
                   name="UN"
@@ -185,7 +187,7 @@ const Body = () => {
               </div>
               <div className="flex items-center">
                 <input
-                  className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 "
+                  className="w-5 h-5 text-blue-600 bg-gray-100 border-[#3d4045] focus:ring-blue-500 "
                   type="checkbox"
                   id="IND"
                   name="IND"
