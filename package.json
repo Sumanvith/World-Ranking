@@ -2,7 +2,6 @@
   "name": "world-ranking",
   "version": "1.0.0",
   "description": "world-ranking",
-  "main": "index.html",
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
